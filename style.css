@@ -1,0 +1,24 @@
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: sans-serif;
+}
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+.popup-container {
+    max-width: 250px;
+    font-size: 14px;
+}
+.popup-container input[type='number'],
+.popup-container textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+.popup-container .popup-image-preview {
+    margin-top: 5px;
+}
