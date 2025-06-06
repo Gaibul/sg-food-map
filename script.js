@@ -264,4 +264,85 @@ function renderAllPoints() {
 }
 renderAllPoints();
 
-// Replace data rendering with merged CSV + addedPlaces
+// 📦 Backup popup button
+const backupBtnUI = document.createElement('button');
+backupBtnUI.innerText = '📦 Backup';
+backupBtnUI.style.position = 'absolute';
+backupBtnUI.style.bottom = '190px';
+backupBtnUI.style.left = '10px';
+backupBtnUI.style.zIndex = 1000;
+backupBtnUI.onclick = () => {
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.bottom = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.background = '#fff';
+    modal.style.padding = '15px';
+    modal.style.borderTop = '2px solid #ccc';
+    modal.style.zIndex = 9999;
+    modal.innerHTML = `
+        <b>Backup Options</b><br/><br/>
+        <button id="doExport">📤 Export Backup</button>
+        <button id="doImport">📥 Import Backup</button>
+        <button onclick="this.parentElement.remove()">❌ Close</button>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById("doExport").onclick = () => backupBtn.click();
+    document.getElementById("doImport").onclick = () => restoreBtn.click();
+};
+document.body.appendChild(backupBtnUI);
+
+// Remove zoom buttons
+map.zoomControl.remove();
+
+// Fix image saving and confirm buttons
+function confirmChanges(key) {
+    const noteInput = document.getElementById(`note_${key}`);
+    const photoInput = document.getElementById(`photo_${key}`);
+    const note = noteInput?.value ?? "";
+    const photoFile = photoInput?.files[0];
+    if (!storedData[key]) storedData[key] = {};
+    storedData[key].note = note;
+
+    if (photoFile) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            storedData[key].photo = reader.result;
+            localStorage.setItem('foodRatings', JSON.stringify(storedData));
+            alert("Saved!");
+        };
+        reader.readAsDataURL(photoFile);
+    } else {
+        localStorage.setItem('foodRatings', JSON.stringify(storedData));
+        alert("Saved!");
+    }
+}
+
+// Update popup content function
+function createPopupContent(key, name, food, desc, tips, url) {
+    const rating = storedData[key]?.rating ?? '';
+    const note = storedData[key]?.note ?? '';
+    const img = storedData[key]?.photo ? `<img src="${storedData[key].photo}" style="max-width:100%;border-radius:8px;margin-top:5px;">` : '';
+    const showTips = tips && tips !== 'nan' ? `<div style="margin-top:4px;"><b>Tips:</b> ${tips}</div>` : '';
+    return `
+        <div style="max-width:280px;font-size:14px;">
+            <b>${name}</b><br/>
+            <i>${food} – ${desc}</i><br/>
+            <a href="${url}" target="_blank">📍 Open in Google Maps</a>
+            ${showTips}
+            <hr/>
+            <label>Rating:</label><br/>
+            <input type="number" id="rate_${key}" min="0" max="10" value="${rating}" style="width:100%;" />
+            <br/><br/>
+            <label>Notes:</label><br/>
+            <textarea id="note_${key}" style="width:100%;">${note}</textarea>
+            <br/><br/>
+            <label>Photo:</label><br/>
+            <input type="file" id="photo_${key}" accept="image/*" />
+            <br/><br/>
+            <button onclick="saveRating('${key}')">💾 Confirm</button>
+            ${img}
+        </div>
+    `;
+}
