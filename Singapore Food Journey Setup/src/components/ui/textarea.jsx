@@ -1,0 +1,1 @@
+export function Textarea(props){ return <textarea {...props} className={['border rounded-xl px-3 py-2 text-sm w-full min-h-[80px]', props.className||''].join(' ')} /> }
