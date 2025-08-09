@@ -1,4 +1,0 @@
-export function Badge({ variant='secondary', className='', ...props }){
-  const v = variant==='default' ? 'bg-black text-white' : 'bg-neutral-100';
-  return <span {...props} className={['inline-flex items-center px-2 py-1 rounded-full text-xs', v, className].join(' ')} />
-}
